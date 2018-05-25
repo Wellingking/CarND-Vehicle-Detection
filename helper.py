@@ -8,12 +8,6 @@ import cv2
 
 
 def extract_files(parent, extension='.png'):
-    """
-
-    :param parent:
-    :param extension:
-    :return:
-    """
     file_container = []
     for root, dirs, files in os.walk(parent):
         for file in files:
@@ -23,14 +17,6 @@ def extract_files(parent, extension='.png'):
 
 
 def display_random_images(image_files, num_of_images=12, images_per_row=6, main_title=None):
-    """
-
-    :param image_files:
-    :param num_of_images:
-    :param images_per_row:
-    :param main_title:
-    :return:
-    """
     random_files = np.random.choice(image_files, num_of_images)
     images = []
     for random_file in random_files:
@@ -51,14 +37,6 @@ def display_random_images(image_files, num_of_images=12, images_per_row=6, main_
 
 
 def visualize_hog_features(hog_features, images, color_map=None, suptitle=None):
-    """
-
-    :param hog_features:
-    :param images:
-    :param color_map:
-    :param suptitle:
-    :return:
-    """
     num_images = len(images)
     space = gridspec.GridSpec(num_images, 2)
     space.update(wspace=0.1, hspace=0.1)
@@ -91,27 +69,11 @@ def add_heat(heatmap, bbox_list):
 
 
 def draw_sliding_windows(image, windows, color=(197, 27, 138), thick=3):
-    """
-    Draw app possible sliding windows on top of the given image.
-
-    :param image:
-    :param windows:
-    :param color:
-    :param thick:
-    :return:
-    """
     for window in windows:
         cv2.rectangle(image, window[0], window[1], color, thick)
     return image
 
 def apply_threshold(heatmap, threshold):
-    """
-    Simple unitliy function which encapsulates heap-map thresholding algorithm
-
-    :param heatmap:
-    :param threshold:
-    :return:
-    """
     # Zero out pixels below the threshold
     heatmap[heatmap <= threshold] = 0
     # Return thresholded map
@@ -119,13 +81,6 @@ def apply_threshold(heatmap, threshold):
 
 
 def draw_labeled_bboxes(img, labels):
-    """
-    Draw boxes on top of the given image
-
-    :param img:
-    :param labels:
-    :return:
-    """
     # Iterate through all detected cars
     for car_number in range(1, labels[1] + 1):
         # Find pixels with each car_number label value
@@ -141,32 +96,32 @@ def draw_labeled_bboxes(img, labels):
     return img
 
 
-if __name__ == '__main__':
-    import vehicle
-    import cv2
-
-    vehicle_files_dir = './data/vehicles/'
-    non_vehicle_files_dir = './data/non-vehicles/'
-
-    vehicle_files = extract_files(vehicle_files_dir)
-    non_vehicle_files = extract_files(non_vehicle_files_dir)
-
-    print('Number of vehicle files: {}'.format(len(vehicle_files)))
-    print('Number of non-vehicle files: {}'.format(len(non_vehicle_files)))
-    image = img.imread(vehicle_files[0])
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    # Define HOG parameters
-    orient = 9
-    pix_per_cell = 8
-    cell_per_block = 2
-    # Call our function with vis=True to see an image output
-    features, hog_image = vehicle.get_hog_features(gray, orient,
-                                                   pix_per_cell, cell_per_block,
-                                                   vis=True, feature_vec=False)
-
-    # Plot the examples
-    a = []
-    b = []
-    a.append(hog_image)
-    b.append(gray)
-    visualize_hog_features(a, b)
+#if __name__ == '__main__':
+#    import vehicle
+#    import cv2
+#
+#    vehicle_files_dir = './data/vehicles/'
+#    non_vehicle_files_dir = './data/non-vehicles/'
+#
+#    vehicle_files = extract_files(vehicle_files_dir)
+#    non_vehicle_files = extract_files(non_vehicle_files_dir)
+#
+#    print('Number of vehicle files: {}'.format(len(vehicle_files)))
+#    print('Number of non-vehicle files: {}'.format(len(non_vehicle_files)))
+#    image = img.imread(vehicle_files[0])
+#    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+#    # Define HOG parameters
+#    orient = 9
+#    pix_per_cell = 8
+#    cell_per_block = 2
+#    # Call our function with vis=True to see an image output
+#    features, hog_image = vehicle.get_hog_features(gray, orient,
+#                                                   pix_per_cell, cell_per_block,
+#                                                   vis=True, feature_vec=False)
+#
+#    # Plot the examples
+#    a = []
+#    b = []
+#    a.append(hog_image)
+#    b.append(gray)
+#    visualize_hog_features(a, b)

@@ -4,37 +4,12 @@ from scipy.ndimage.measurements import label
 from skimage.feature import hog
 
 import helper
-from vehicle_detector_constants import FRAME_QUEUE_SIZE
-from vehicle_detector_constants import IMAGE_NORMALIZER
+
+IMAGE_NORMALIZER = 255.0
+FRAME_QUEUE_SIZE = 25
 
 
 def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, feature_vec=True):
-    """
-    This method generates hog features from the input image according to the values of the following parameters
-
-    :param img:
-        The input image
-
-    :param orient:
-
-
-    :param pix_per_cell:
-
-
-    :param cell_per_block:
-
-
-    :param vis:
-
-
-    :param feature_vec:
-
-
-
-    :return:
-        Generated features
-
-    """
     if vis:
         features, hog_image = hog(img, orientations=orient, pixels_per_cell=(pix_per_cell, pix_per_cell), \
                                   cells_per_block=(cell_per_block, cell_per_block), transform_sqrt=False, \
@@ -49,13 +24,6 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, featu
 
 
 def bin_spatial(image, size=(32, 32)):
-    """
-    This method calculate and returns spacial bins according to the size of the special bin
-
-    :param image:
-    :param size:
-    :return:
-    """
     color1 = cv2.resize(image[:, :, 0], size).ravel()
     color2 = cv2.resize(image[:, :, 1], size).ravel()
     color3 = cv2.resize(image[:, :, 2], size).ravel()
@@ -63,14 +31,6 @@ def bin_spatial(image, size=(32, 32)):
 
 
 def color_hist(img, nbins=32):
-    """
-    This method calculates color histogram from the input image and returns
-    those histograms.
-
-    :param img:
-    :param nbins:
-    :return:
-    """
     color_1_hist = np.histogram(img[:, :, 0], bins=nbins)
     color_2_hist = np.histogram(img[:, :, 0], bins=nbins)
     color_3_hist = np.histogram(img[:, :, 0], bins=nbins)
@@ -80,22 +40,6 @@ def color_hist(img, nbins=32):
 def extract_features(images, cspace='RGB', orient=9, spatial_size=(32, 32), hist_bins=32,
                      pix_per_cell=8, cell_per_block=2,
                      spatial_feat=True, hist_feat=True, hog_feat=True, hog_channel=0):
-    """
-    Extract features from a list of images.
-
-    :param images:
-    :param cspace:
-    :param orient:
-    :param spatial_size:
-    :param hist_bins:
-    :param pix_per_cell:
-    :param cell_per_block:
-    :param spatial_feat:
-    :param hist_feat:
-    :param hog_feat:
-    :param hog_channel:
-    :return:
-    """
     features = []
     # Iterate through the list of images
     for image in images:
@@ -149,18 +93,6 @@ def extract_features(images, cspace='RGB', orient=9, spatial_size=(32, 32), hist
 
 def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                  xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
-    """
-    This method takes an image, start and stop positions in both x and y,
-    window size (x and y dimensions) and overlap fraction (for both x and y).
-    It returns the coordinates of all possible sliding windows.
-
-    :param img:
-    :param x_start_stop:
-    :param y_start_stop:
-    :param xy_window:
-    :param xy_overlap:
-    :return:
-    """
     # If x and/or y start/stop positions not defined, set to image size
     if x_start_stop[0] is None:
         x_start_stop[0] = 0
@@ -202,23 +134,6 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
                         hist_bins=32, orient=9,
                         pix_per_cell=8, cell_per_block=2, hog_channel=0,
                         spatial_feat=True, hist_feat=True, hog_feat=True, vis=True):
-    """
-    This method generates features from a single image.
-
-    :param img:
-    :param color_space:
-    :param spatial_size:
-    :param hist_bins:
-    :param orient:
-    :param pix_per_cell:
-    :param cell_per_block:
-    :param hog_channel:
-    :param spatial_feat:
-    :param hist_feat:
-    :param hog_feat:
-    :param vis:
-    :return:
-    """
     # 1) Define an empty list to receive features
     img_features = []
     # 2) Apply color conversion if other than 'RGB'
@@ -275,24 +190,6 @@ def search_windows(img, windows, clf, scaler, color_space,
                    orient, pix_per_cell, cell_per_block,
                    hog_channel, spatial_feat,
                    hist_feat, hog_feat):
-    """
-
-    :param img:
-    :param windows:
-    :param clf:
-    :param scaler:
-    :param color_space:
-    :param spatial_size:
-    :param hist_bins:
-    :param orient:
-    :param pix_per_cell:
-    :param cell_per_block:
-    :param hog_channel:
-    :param spatial_feat:
-    :param hist_feat:
-    :param hog_feat:
-    :return:
-    """
     on_windows = []
     for window in windows:
         test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))
@@ -311,10 +208,6 @@ def search_windows(img, windows, clf, scaler, color_space,
 
 
 class FrameQueue:
-    """
-    This class is used to maintain a queue of heat-map frames
-    """
-
     def __init__(self, max_frames):
         self.frames = []
         self.max_frames = max_frames
@@ -340,12 +233,6 @@ class FrameQueue:
 
 
 class VehicleDetector:
-    """
-    This is the main class of the project. It encapsulates methods we created for sliding windows, feature generation,
-    machine learning mode, and remove duplicates and false positives. Also, internally, it calls other utility methods
-    for task such as drawing bounding boxes.
-    """
-
     def __init__(self, color_space, orient, pix_per_cell, cell_per_block,
                  hog_channel, spatial_size, hist_bins, spatial_feat,
                  hist_feat, hog_feat, y_start_stop, x_start_stop, xy_window,
